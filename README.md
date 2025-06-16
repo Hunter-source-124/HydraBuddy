@@ -75,3 +75,157 @@ Kör demokoden ovan för att testa.
 
 Bidrag
 testa koden och ge oss feedback
+
+
+
+KODEN:
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydraBuddy Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background-color: #36A2EB;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e9ecef;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 70%;
+        }
+        .bot-message {
+            background-color: #36A2EB;
+            color: white;
+            margin-left: 20px;
+        }
+        .user-message {
+            background-color: #dee2e6;
+            margin-right: 20px;
+            text-align: right;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #36A2EB;
+            color: white;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background-color: #1e87d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>HydraBuddy</h3>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">Hej! Jag är HydraBuddy, din vattenpåminnare. Hur kan jag hjälpa dig idag? (Skriv 'status' för att kolla ditt behov)</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Skriv ditt meddelande...">
+            <button onclick="sendMessage()">Skicka</button>
+        </div>
+    </div>
+
+    <script>
+        // AI-logik (baserat på tidigare kod)
+        function predictDrinkNeed(hours, steps, daylight) {
+            const X = [
+                [10, 2000, 1], [14, 5000, 1], [20, 4000, 0], [20, 8000, 0]
+            ];
+            const y = [0, 1, 0, 1];
+
+            // Simpel modell (eftersom vi inte har scikit-learn här, använder vi en dummy-prediktion)
+            let probability = 0;
+            if (hours >= 14 && hours <= 18 && steps > 4000 && daylight === 1) probability = 0.7;
+            else if (hours >= 20 && steps > 6000) probability = 0.6;
+            else probability = 0.2;
+
+            return probability;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput').value.toLowerCase();
+            const chatMessages = document.getElementById('chatMessages');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'message user-message';
+            userMessage.textContent = input;
+            chatMessages.appendChild(userMessage);
+
+            // Bot-svar
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            let response = '';
+
+            if (input === 'status') {
+                const currentTime = new Date().getHours();
+                const currentSteps = 5000; // Simulerade steg
+                const daylight = currentTime >= 6 && currentTime < 18 ? 1 : 0;
+                const probability = predictDrinkNeed(currentTime, currentSteps, daylight);
+                response = `Status vid ${new Date().toLocaleTimeString()}: Sannolikhet att du behöver dricka är ${probability.toFixed(2)}.`;
+                if (probability > 0.5) {
+                    response += ' Tid att dricka vatten! 💧';
+                }
+            } else {
+                response = 'Skriv "status" för att kolla ditt vätskebehov!';
+            }
+
+            botMessage.textContent = response;
+            chatMessages.appendChild(botMessage);
+
+            // Rensa input och scrolla till botten
+            document.getElementById('userInput').value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+</body>
+</html>
